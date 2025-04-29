@@ -73,12 +73,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Insert') {
           $successMessage = "Form submitted successfully!";
         }
 
+        header("Location: product_coast.php" . $_SERVER['PHP_SELF']);
+        exit();
       
     } else {
       $errorMessage = "Error: " . $conn->error;
     }
   } else {
     $errorMessage = "Please fill in all required fields.";
+    header("Location: product_coast.php" . $_SERVER['PHP_SELF']);
+    exit();
   }
 }
 
@@ -113,11 +117,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
     if ($conn->query($update_sql) === TRUE) {
 
       $successMessage = "Record updated successfully!";
+      header("Location: product_coast.php" . $_SERVER['PHP_SELF']);
+        exit();
     } else {
       $errorMessage = "Error updating record: " . $conn->error;
     }
   } else {
     $errorMessage = "Please fill in all required fields.";
+    header("Location: product_coast.php" . $_SERVER['PHP_SELF']);
+        exit();
   }
 }
 
@@ -222,18 +230,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
                 <label for="finish_date">Product Completion Date</label>
                 <input type="date" class="form-control" id="finish_date" name="finish_date">
               </div>
-              <div class="form-group col-md-3">
-                <label for="totalman_total">Total No. of Manpower Used</label>
+              <div class="form-group col-md-2">
+                <label for="totalman_total">Total Days</label>
+                <input type="number" class="form-control" id="totalman_total" name="totalman_total" placeholder="days">
+              </div>
+              <div class="form-group col-md-2">
+                <label for="totalman_total"> No. of Manpower Used</label>
                 <input type="number" class="form-control" id="totalman_total" name="totalman_total" placeholder="e.g. 15">
               </div>
-              <div class="form-group col-md-3">
+              <div class="form-group col-md-2">
                 <label for="manpower_coast">Total Cost of Manpower</label>
                 <input type="number" step="0.01" class="form-control" id="manpower_coast" name="manpower_coast" placeholder="e.g. 12000">
               </div>
             </div>
 
             <div class="row">
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-3">
                 <label for="raw_type">Raw Material Type</label>
                 <select class="form-control" id="raw_type" name="raw_type" required>
                   <option value="">Select Material</option>
@@ -246,22 +258,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
                   <option value="Others">Others</option>
                 </select>
               </div>
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-3">
+                <label for="weightof_material">Created Product Name</label>
+                <input type="number" step="0.01" class="form-control" id="weightof_material" name="weightof_material">
+              </div>
+              <div class="form-group col-md-3">
                 <label for="weightof_material">Total Weight of Material Used (kg)</label>
                 <input type="number" step="0.01" class="form-control" id="weightof_material" name="weightof_material">
               </div>
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-3">
                 <label for="amountof_material">Raw Material Amount (₹)</label>
                 <input type="number" step="0.01" class="form-control" id="amountof_material" name="amountof_material">
               </div>
             </div>
 
             <div class="row">
-              <div class="form-group col-md-6">
+              <div class="form-group col-md-2">
                 <label for="other_coast">Other Costs (₹)</label>
                 <input type="number" step="0.01" class="form-control" id="other_coast" name="other_coast">
               </div>
-              <div class="form-group col-md-6">
+              <div class="form-group col-md-4">
                 <label for="total_amount">Total Manufacturing Cost (₹)</label>
                 <input type="number" step="0.01" class="form-control" id="total_amount" name="total_amount" required>
               </div>
@@ -281,20 +297,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
         <thead>
           <tr>
             <th>SL.No</th>
-            <th>Date</th>
-            <th>Name of The Supplier</th>
-            <th>Name Of The Material</th>
-            <th>Van Wise Material</th>
-            <th>Without Van Material</th>
-            <th>Weight Of Material</th>
-            <th>Bill No</th>
-            <th>Total Amount Of Material</th>
+            <th>Product Start Date</th>
+            <th>Product Name</th>
+            <th>Raw Material Used</th>
+            <th>Raw Material Weight</th>
+           
+            <th>Weight Of Product</th>
+            <th>Total Completion Day</th>
+            <th>Total Manpower Used</th>
+            <th>Manpower Coast</th>
+            <th>Other Coast</th>
+            <th>Total Amount Of Product</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <?php
-          $sql = "SELECT * FROM `raw_material` WHERE 1";
+          $sql = "SELECT * FROM `completed_prod_coast` WHERE 1";
           $result = $conn->query($sql);
 
           while ($row = mysqli_fetch_assoc($result)) { ?>
@@ -302,11 +321,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
               <td><?php echo $row['id']; ?></td>
               <td><?php echo $row['entry_date']; ?></td>
               <td><?php echo $row['name_supplier']; ?></td>
-              <td><?php echo $row['name_material']; ?></td>
-              <td><?php echo $row['van_wise']; ?></td>
-              <td><?php echo $row['without_van']; ?></td>
+              <td><?php echo $row['raw_material_type']; ?></td>
+              <td><?php echo $row['weightof_material']; ?></td>
+              <td><?php echo $row['weightof_material']; ?></td>
               <td><?php echo $row['weight_material']; ?></td>
               <td><?php echo $row['bill_no']; ?></td>
+              <td><?php echo $row['total_amount']; ?></td>
+              <td><?php echo $row['total_amount']; ?></td>
               <td><?php echo $row['total_amount']; ?></td>
               <td>
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal<?php echo $row['id']; ?>">
@@ -431,6 +452,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+
+    <script>
+
+    </script>
+
 
     <script>
       $(document).ready(function() {

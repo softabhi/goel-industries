@@ -12,9 +12,9 @@ $errorMessage = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Insert') {
 
-  // print_r($_POST);
+  print_r($_POST);
 
-  // exit;
+  exit;
   $entry_date = $_POST['entry_date'];
   $name_supplier = $_POST['name_supplier'];
   $name_material = $_POST['name_material'];
@@ -71,6 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Insert') {
 
         // Store success message
         $successMessage = "Form submitted successfully!";
+        header("Location: add_raw_material.php" . $_SERVER['PHP_SELF']);
+        exit();
       } else {
         $errorMessage = "Error: " . $conn->error;
       }
@@ -79,6 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Insert') {
 
   } else {
     $errorMessage = "Please fill in all fields.";
+    header("Location: add_raw_material.php" . $_SERVER['PHP_SELF']);
+        exit();
   }
 }
 if (isset($_SESSION['submitted']) && $_SESSION['submitted'] == true) {
@@ -114,11 +118,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
 
     if ($conn->query($update_sql) === TRUE) {
       $successMessage = "Record updated successfully!";
+      header("Location: add_raw_material.php" . $_SERVER['PHP_SELF']);
+      exit();
     } else {
       $errorMessage = "Error updating record: " . $conn->error;
     }
   } else {
     $errorMessage = "Please fill in all required fields.";
+    header("Location: add_raw_material.php" . $_SERVER['PHP_SELF']);
+    exit();
   }
 }
 
