@@ -10,6 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Insert') {
 
   $start_date = $_POST['start_date'];
   $finish_date = $_POST['finish_date'];
+  $total_days = $_POST['total_days'];
+  $product_name = $_POST['created_produ_name'];
   $totalman_total = $_POST['totalman_total'];
   $manpower_coast = $_POST['manpower_coast'];
   $raw_type = $_POST['raw_type'];
@@ -22,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Insert') {
     $sql = "INSERT INTO completed_prod_coast(
         entry_date,
         finish_date,
+        product_name,
+        total_days,
         raw_material_type,
         manpower_coast,
         totalman_total,
@@ -32,6 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Insert') {
       ) VALUES (
         '$start_date',
         '$finish_date',
+        '$product_name',
+        '$total_days',
         '$raw_type',
         '$manpower_coast',
         '$totalman_total',
@@ -73,8 +79,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Insert') {
           $successMessage = "Form submitted successfully!";
         }
 
-        header("Location: product_coast.php" . $_SERVER['PHP_SELF']);
-        exit();
+        header("Location: " . $_SERVER['PHP_SELF']);
+         exit;
+      
       
     } else {
       $errorMessage = "Error: " . $conn->error;
@@ -228,12 +235,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
               </div>
               <div class="form-group col-md-3">
                 <label for="finish_date">Product Completion Date</label>
-                <input type="date" class="form-control" id="finish_date" name="finish_date">
+                <input type="date" class="form-control" id="finish_date" name="finish_date" onchange="totalDayCount()">
               </div>
               <div class="form-group col-md-2">
                 <label for="totalman_total">Total Days</label>
-                <input type="number" class="form-control" id="totalman_total" name="totalman_total" placeholder="days">
+                <input type="number" class="form-control" id="total_days" name="total_days" placeholder="days">
               </div>
+
+           
               <div class="form-group col-md-2">
                 <label for="totalman_total"> No. of Manpower Used</label>
                 <input type="number" class="form-control" id="totalman_total" name="totalman_total" placeholder="e.g. 15">
@@ -260,7 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
               </div>
               <div class="form-group col-md-3">
                 <label for="weightof_material">Created Product Name</label>
-                <input type="number" step="0.01" class="form-control" id="weightof_material" name="weightof_material">
+                <input type="text" step="0.01" class="form-control" id="created_produ_name" name="created_produ_name">
               </div>
               <div class="form-group col-md-3">
                 <label for="weightof_material">Total Weight of Material Used (kg)</label>
@@ -272,10 +281,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
               </div>
             </div>
 
+
             <div class="row">
               <div class="form-group col-md-2">
                 <label for="other_coast">Other Costs (₹)</label>
-                <input type="number" step="0.01" class="form-control" id="other_coast" name="other_coast">
+                <input type="number" step="0.01" class="form-control" id="other_coast" name="other_coast" onkeyup="totalOfProduct()">
               </div>
               <div class="form-group col-md-4">
                 <label for="total_amount">Total Manufacturing Cost (₹)</label>
@@ -283,6 +293,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
               </div>
             </div>
 
+            <script>
+              function totalOfProduct(){
+                var manpower_coast= Number(document.getElementById('manpower_coast').value);
+                var other_coast= Number(document.getElementById('other_coast').value);
+                var amountof_material= Number(document.getElementById('amountof_material').value);
+
+                document.getElementById('total_amount').value = manpower_coast+amountof_material+other_coast;
+              }
+            </script>
             <!-- Hidden Field -->
             <input type="hidden" name="action" value="Insert">
 
@@ -320,14 +339,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
             <tr>
               <td><?php echo $row['id']; ?></td>
               <td><?php echo $row['entry_date']; ?></td>
-              <td><?php echo $row['raw__material_type']; ?></td>
+              <td><?php echo $row['product_name']; ?></td>
               <td><?php echo $row['raw_material_type']; ?></td>
               <td><?php echo $row['weightof_material']; ?></td>
               <td><?php echo $row['weightof_material']; ?></td>
-              <td><?php echo $row['weight_material']; ?></td>
-              <td><?php echo $row['bill_no']; ?></td>
-              <td><?php echo $row['total_amount']; ?></td>
-              <td><?php echo $row['total_amount']; ?></td>
+              <td><?php echo $row['total_days']; ?></td>
+              <td><?php echo $row['totalman_total']; ?></td>
+              <td><?php echo $row['manpower_coast']; ?></td>
+              <td><?php echo $row['other_coast']; ?></td>
               <td><?php echo $row['total_amount']; ?></td>
               <td>
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal<?php echo $row['id']; ?>">
@@ -454,9 +473,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 
 
-    <script>
+   <script>
+function totalDayCount() {
+    // Get the values from input fields
+    var stDate = document.getElementById('start_date').value;
+    var ctDate = document.getElementById('finish_date').value;
+console.log(stDate);
+    // Convert the date strings into Date objects
+    var startDate = new Date(stDate);
+    var finishDate = new Date(ctDate);
+    var today = new Date();
 
-    </script>
+    console.log(startDate);
+    // Clear the time portion for accurate day difference
+    startDate.setHours(0,0,0,0);
+    finishDate.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
+
+    // Calculate total days between start and finish date
+    var totalDays = Math.round((finishDate - startDate) / (1000 * 60 * 60 * 24));
+
+    // Calculate days from today to finish date
+    var daysFromToday = Math.round((finishDate - today) / (1000 * 60 * 60 * 24));
+
+    // Output results
+    console.log("Total days from start to finish:", totalDays);
+    console.log("Days remaining from today to finish:", daysFromToday);
+
+    // Optional: display the result in the HTML
+    document.getElementById('total_days').value =  totalDays;
+    // document.getElementById('days_from_today_output').innerText = "From today: " + daysFromToday;
+}
+
+
+   </script>
 
 
     <script>
@@ -497,41 +547,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
 
 
 
-    <!-- <script>
-      $(document).ready(function() {
-        $('.btn-update').click(function(e) {
-          e.preventDefault();
-
-          if (!confirm("Are you sure you want to update this entry?")) return;
-
-          const form = $(this).closest('.update-form');
-          const formData = form.serialize();
-
-          console.log(formData);
-          $.ajax({
-            url: 'update_raw.php',
-            type: 'POST',
-            data: formData,
-            success: function(response) {
-              console.log("Response from server:", response);
-              // Close modal
-              form.closest('.modal').modal('hide');
-
-              // Refresh the page or show success message
-              $('#error_section').html('<div class="alert alert-success">' + response + '</div>');
-
-              // Optionally refresh table data
-              setTimeout(() => {
-                location.reload(); // Refresh to reflect updated data in table
-              }, 1500);
-            },
-            error: function() {
-              $('#error_section').html('<div class="alert alert-danger">Error occurred while updating.</div>');
-            }
-          });
-        });
-      });
-    </script> -->
+   
 
 
     <script>
