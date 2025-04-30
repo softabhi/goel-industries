@@ -320,7 +320,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
             <tr>
               <td><?php echo $row['id']; ?></td>
               <td><?php echo $row['entry_date']; ?></td>
-              <td><?php echo $row['name_supplier']; ?></td>
+              <td><?php echo $row['raw__material_type']; ?></td>
               <td><?php echo $row['raw_material_type']; ?></td>
               <td><?php echo $row['weightof_material']; ?></td>
               <td><?php echo $row['weightof_material']; ?></td>
