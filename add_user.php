@@ -3,8 +3,8 @@ include './backend/auth.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 // include './insert_raw.php';
-include './update_raw.php';
-include './delete_raw.php';
+// include './update_raw.php';
+// include './delete_raw.php';
 
 // exit;
 $successMessage = '';

@@ -1,7 +1,7 @@
 <?php
 include './backend/auth.php';
 ini_set('display_errors', 1);
-error_reporting(E_ALL);
+// error_reporting(E_ALL);
 
 $successMessage = '';
 $errorMessage = '';
@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Insert') {
   $raw_type = $_POST['raw_type'];
   $weightof_material = $_POST['weightof_material'];
   $amountof_material = $_POST['amountof_material'];
+  $overhead_coast = $_POST['overhead_coast'];
   $other_coast = $_POST['other_coast'];
   $total_amount = $_POST['total_amount'];
 
@@ -31,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Insert') {
         totalman_total,
         weightof_material,
         amountof_material,
+        overhead_coast,
         other_coast,
         total_amount
       ) VALUES (
@@ -43,46 +45,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Insert') {
         '$totalman_total',
         '$weightof_material',
         '$amountof_material',
+        '$overhead_coast',
         '$other_coast',
         '$total_amount'
       )";
 
     if ($conn->query($sql) === TRUE) {
 
-        $current_stock = mysqli_query($conn,"SELECT * from raw_material where raw_material_type='$raw_type'");
-        $stock = mysqli_fetch_assoc($current_stock);
-        // $stock = $current_stock->fetch_assoc();
-        $total_stock = $stock['material_without_van']; 
-        $available_stock = $stock['available_stock']; 
-        // print_r($current_stock);
+      $current_stock = mysqli_query($conn, "SELECT * from raw_material where raw_material_type='$raw_type'");
+      $stock = mysqli_fetch_assoc($current_stock);
+      // $stock = $current_stock->fetch_assoc();
+      $total_stock = $stock['material_without_van'];
+      $available_stock = $stock['available_stock'];
+      // print_r($current_stock);
 
-        
-        if ($available_stock > 0) {
-            $new_stock = $available_stock - $weightof_material;
-        } else {
-            $new_stock = $total_stock - $weightof_material;
-        }
-        
-        // Use prepared statement for security
-        $stmt = $conn->prepare("UPDATE raw_material SET available_stock = ? WHERE raw_material_type = ?");
-        $stmt->bind_param("ds", $new_stock, $raw_type); // d = double/float, s = string
-        $stmt->execute();
-        
-        
-        // echo $stmt;
-        print_r($stmt);
-        $stmt->close();
-       
-        if($stmt){
-          // exit;
-          $_SESSION['submitted'] = true;
-          $successMessage = "Form submitted successfully!";
-        }
 
-        header("Location: " . $_SERVER['PHP_SELF']);
-         exit;
-      
-      
+      if ($available_stock > 0) {
+        $new_stock = $available_stock - $weightof_material;
+      } else {
+        $new_stock = $total_stock - $weightof_material;
+      }
+
+      // Use prepared statement for security
+      $stmt = $conn->prepare("UPDATE raw_material SET available_stock = ? WHERE raw_material_type = ?");
+      $stmt->bind_param("ds", $new_stock, $raw_type); // d = double/float, s = string
+      $stmt->execute();
+
+
+      // echo $stmt;
+      print_r($stmt);
+      $stmt->close();
+
+      if ($stmt) {
+        // exit;
+        $_SESSION['submitted'] = true;
+        $successMessage = "Form submitted successfully!";
+      }
+
+      header("Location: " . $_SERVER['PHP_SELF']);
+      exit;
     } else {
       $errorMessage = "Error: " . $conn->error;
     }
@@ -125,14 +126,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
 
       $successMessage = "Record updated successfully!";
       header("Location: product_coast.php" . $_SERVER['PHP_SELF']);
-        exit();
+      exit();
     } else {
       $errorMessage = "Error updating record: " . $conn->error;
     }
   } else {
     $errorMessage = "Please fill in all required fields.";
     header("Location: product_coast.php" . $_SERVER['PHP_SELF']);
-        exit();
+    exit();
   }
 }
 
@@ -242,13 +243,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
                 <input type="number" class="form-control" id="total_days" name="total_days" placeholder="days">
               </div>
 
-           
+
               <div class="form-group col-md-2">
                 <label for="totalman_total"> No. of Manpower Used</label>
                 <input type="number" class="form-control" id="totalman_total" name="totalman_total" placeholder="e.g. 15">
               </div>
               <div class="form-group col-md-2">
-                <label for="manpower_coast">Total Cost of Manpower</label>
+                <label for="manpower_coast">Direct Labour Cost</label>
                 <input type="number" step="0.01" class="form-control" id="manpower_coast" name="manpower_coast" placeholder="e.g. 12000">
               </div>
             </div>
@@ -276,30 +277,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
                 <input type="number" step="0.01" class="form-control" id="weightof_material" name="weightof_material">
               </div>
               <div class="form-group col-md-3">
-                <label for="amountof_material">Raw Material Amount (₹)</label>
-                <input type="number" step="0.01" class="form-control" id="amountof_material" name="amountof_material">
+                <label for="amountof_material">Direct Material Coast (₹)</label>
+                <input type="number" step="0.01" class="form-control" id="amountof_material" name="amountof_material" onkeyup="totalOfProduct()">
               </div>
             </div>
 
 
             <div class="row">
               <div class="form-group col-md-2">
+                <label for="other_coast">Overhead Coast (₹)</label>
+                <input type="number" step="0.01" class="form-control" id="overhead_coast" name="overhead_coast" onkeyup="totalOfProduct()">
+              </div>
+              <div class="form-group col-md-2">
                 <label for="other_coast">Other Costs (₹)</label>
                 <input type="number" step="0.01" class="form-control" id="other_coast" name="other_coast" onkeyup="totalOfProduct()">
               </div>
               <div class="form-group col-md-4">
-                <label for="total_amount">Total Manufacturing Cost (₹)</label>
+                <label for="total_amount">Total Manufacturing Cost ( )</label>
                 <input type="number" step="0.01" class="form-control" id="total_amount" name="total_amount" required>
               </div>
             </div>
 
             <script>
-              function totalOfProduct(){
-                var manpower_coast= Number(document.getElementById('manpower_coast').value);
-                var other_coast= Number(document.getElementById('other_coast').value);
-                var amountof_material= Number(document.getElementById('amountof_material').value);
+              function totalOfProduct() {
+                var manpower_coast = Number(document.getElementById('manpower_coast').value);
+                var other_coast = Number(document.getElementById('other_coast').value);
+                var amountof_material = Number(document.getElementById('amountof_material').value);
+                var overhead_coast = Number(document.getElementById('overhead_coast').value);
 
-                document.getElementById('total_amount').value = manpower_coast+amountof_material+other_coast;
+                document.getElementById('total_amount').value = manpower_coast + amountof_material + other_coast + overhead_coast;
               }
             </script>
             <!-- Hidden Field -->
@@ -320,7 +326,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
             <th>Product Name</th>
             <th>Raw Material Used</th>
             <th>Raw Material Weight</th>
-           
+
             <th>Weight Of Product</th>
             <th>Total Completion Day</th>
             <th>Total Manpower Used</th>
@@ -361,6 +367,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
 
                 <form class="delete-form" method="POST" style="display:inline;">
                   <input type="hidden" name="Id" value="<?php echo $row['id']; ?>">
+                  <input type="hidden" name="action" value="delete_coast_row">
                   <button type="button" class="btn btn-danger btn-sm delete-btn">
                     <i class="fa-solid fa-trash"></i>
                   </button>
@@ -473,40 +480,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'Update') {
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 
 
-   <script>
-function totalDayCount() {
-    // Get the values from input fields
-    var stDate = document.getElementById('start_date').value;
-    var ctDate = document.getElementById('finish_date').value;
-console.log(stDate);
-    // Convert the date strings into Date objects
-    var startDate = new Date(stDate);
-    var finishDate = new Date(ctDate);
-    var today = new Date();
+    <script>
+      function totalDayCount() {
+        // Get the values from input fields
+        var stDate = document.getElementById('start_date').value;
+        var ctDate = document.getElementById('finish_date').value;
+        console.log(stDate);
+        // Convert the date strings into Date objects
+        var startDate = new Date(stDate);
+        var finishDate = new Date(ctDate);
+        var today = new Date();
 
-    console.log(startDate);
-    // Clear the time portion for accurate day difference
-    startDate.setHours(0,0,0,0);
-    finishDate.setHours(0,0,0,0);
-    today.setHours(0,0,0,0);
+        console.log(startDate);
+        // Clear the time portion for accurate day difference
+        startDate.setHours(0, 0, 0, 0);
+        finishDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
 
-    // Calculate total days between start and finish date
-    var totalDays = Math.round((finishDate - startDate) / (1000 * 60 * 60 * 24));
+        // Calculate total days between start and finish date
+        var totalDays = Math.round((finishDate - startDate) / (1000 * 60 * 60 * 24));
 
-    // Calculate days from today to finish date
-    var daysFromToday = Math.round((finishDate - today) / (1000 * 60 * 60 * 24));
+        // Calculate days from today to finish date
+        var daysFromToday = Math.round((finishDate - today) / (1000 * 60 * 60 * 24));
 
-    // Output results
-    console.log("Total days from start to finish:", totalDays);
-    console.log("Days remaining from today to finish:", daysFromToday);
+        // Output results
+        console.log("Total days from start to finish:", totalDays);
+        console.log("Days remaining from today to finish:", daysFromToday);
 
-    // Optional: display the result in the HTML
-    document.getElementById('total_days').value =  totalDays;
-    // document.getElementById('days_from_today_output').innerText = "From today: " + daysFromToday;
-}
-
-
-   </script>
+        // Optional: display the result in the HTML
+        document.getElementById('total_days').value = totalDays;
+        // document.getElementById('days_from_today_output').innerText = "From today: " + daysFromToday;
+      }
+    </script>
 
 
     <script>
@@ -547,9 +552,6 @@ console.log(stDate);
 
 
 
-   
-
-
     <script>
       $(document).ready(function() {
         $('.delete-btn').click(function(e) {
@@ -567,10 +569,10 @@ console.log(stDate);
             success: function(response) {
               // Optionally remove the row or reload the page
               form.closest('tr').remove();
-              $('#error_section').html('<div class="alert alert-success">' + response + '</div>');
+              $('#error_section').html('<div class="alert alert-success">' + response + '<button type="button" class="close" data-dismiss="alert">&times;</button> </div>');
             },
             error: function() {
-              $('#error_section').html('<div class="alert alert-danger">Error occurred while deleting.</div>');
+              $('#error_section').html('<div class="alert alert-danger">Error occurred while deleting. <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
             }
           });
         });

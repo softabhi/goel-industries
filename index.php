@@ -1,7 +1,7 @@
 <?php
 session_start();
 include ('backend/connect.php');
-$msg = '';
+// $msg = '';
 
 if(isset($_POST['login'])){
     // echo "hlelo";
@@ -9,22 +9,25 @@ if(isset($_POST['login'])){
      $username=$_POST['username'];
      $password=$_POST['password'];
 
+     if(!empty($username) && !empty($password)){
      $sql = "select * from users where email = '$username' and password='$password' " ;
       $result = $conn->query($sql);
       $row = mysqli_fetch_assoc($result);
 
-      $_SESSION['username'] = $row['name'];
-      $_SESSION['password'] = $row['password'];
-      $_SESSION['user_id'] = $row['id'];
-      
+    
+    }
 
-     print_r( $result);
+    //  print_r( $result);
 // exit;
 
      if(mysqli_num_rows($result) == 1 ){
-
-        $msg='loging successfully';
+        $_SESSION['username'] = $row['name'];
+        $_SESSION['password'] = $row['password'];
+        $_SESSION['user_id'] = $row['id'];
+        $successMessage='loging successfully';
         header("Location:dashboard.php");
+     }else{
+        $errorMessage='User or Password is wrong';
      }
 
     
@@ -38,7 +41,11 @@ if(isset($_POST['login'])){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+        <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css">
+        <title>Document</title>
 </head>
 
 <style>
@@ -163,14 +170,29 @@ if(isset($_POST['login'])){
         font-family: "Roboto", sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        display: flex;
+        justify-content: center;
     }
 </style>
 
 <body>
     <div class="login-page">
-        <?php if(isset($msg)) echo $msg;
-            else echo $msg;
-         ?>
+
+    <?php if (!empty($successMessage)) : ?>
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?php echo $successMessage; ?>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+          </div>
+        <?php endif; ?>
+
+        <?php if (!empty($errorMessage)) : ?>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?php echo $errorMessage; ?>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+          </div>
+        <?php endif; ?>
+
+
         <div class="form">
             <form class="register-form" method="post" >
                 <input type="text" placeholder="name"  name="username" />
@@ -187,7 +209,8 @@ if(isset($_POST['login'])){
             </form>
         </div>
     </div>
-</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
 
 <script>
     $('.message a').click(function() {
@@ -197,5 +220,5 @@ if(isset($_POST['login'])){
         }, "slow");
     });
 </script>
-
+</body>
 </html>

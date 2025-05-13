@@ -11,7 +11,8 @@ $menuItems = [
       ["title" => "Add Raw Material", "url" => "add_raw_material.php"],
       ["title" => "Raw Material Report", "url" => "raw_material_report.php"],
       ["title" => "Supplier Management", "url" => "#"],
-      ["title" => "Stock Levels & Records", "url" => "#"]
+      ["title" => "Stock Levels & Records", "url" => "#"],
+      ["title" => "Payments & Dues", "url" => "raw_material_pay_dues.php"]
     ],
   ],
   [
@@ -19,7 +20,6 @@ $menuItems = [
     "icon" => "fas fa-boxes", // Changed icon
     "pages" => [
       ["title" => "Product Coast", "url" => "product_coast.php"],
-      ["title" => "Raw Material Report", "url" => "raw_material_report.php"],
       ["title" => "Supplier Management", "url" => "#"],
       ["title" => "Stock Levels & Records", "url" => "#"]
     ],
@@ -794,7 +794,7 @@ $activePage = $activePageInfo['activePage'] ?? $currentPage;
   }
 
   .navbar {
-    background: rgba(7, 46, 99, 0.9) !important;
+    background: #700a0a !important;
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(248, 195, 0, 0.2);
     padding: 0.8rem 1rem;
@@ -929,7 +929,7 @@ $activePage = $activePageInfo['activePage'] ?? $currentPage;
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
   <a href="./" class="brand-link">
     <img src="./src/images/goel-industries-logo-e1733293856597 (1).png" alt="Admin Panel Logo" class="brand-image img-square elevation-4">
-    <span class="brand-text font-weight-bold" style="font-size: 17px !important;">Goel Industries Pvt Ltd</span>
+    <span class="brand-text font-weight-bold" style="font-size: 17px !important;">Goel Industries</span>
 
   </a>
   <div class="sidebar">
